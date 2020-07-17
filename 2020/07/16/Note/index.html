@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
   
-  <title itemprop="name">Category: 技术 | Sparkle</title>
+  <title itemprop="name">Graph Structure of Neural Networks | Sparkle</title>
   
     <link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/Singularity-Syo/Collections@1.3/2.png">
   
@@ -262,105 +262,277 @@
   </div>
 </header>
 
-      
+      <link rel="stylesheet" type="text/css" href="/css/sharejs.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
 <div class="pattern-center-blank"></div>
-<div class="pattern-center ">
-  <div class="pattern-attachment-img">
-    <img data-src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/banner/coding.jpg" class="lazyload" onerror="imgError(this,3)" style="width: 100%; height: 100%; object-fit: cover; pointer-events: none;">
-  </div>
-  <header class="pattern-header ">
-    <h1 class="cat-title">野生技术协会</h1>
-    <span class="cat-des">
-      <p>Geek – Only for Love</p>
-    </span>
-  </header>
-</div>
+
 <div id="content" class="site-content">
   <div id="primary" class="content-area">
     <main id="main" class="site-main" role="main">
-      
-  <!-- 首页默认取最最新文章集 -->
-  
-    <article class="post post-list" itemscope="" itemtype="https://schema.org/BlogPosting">
-  <div class="post-entry">
-    <div class="feature">
-      <a href="/2018/12/12/Hexo-Theme-Sakura/">
-        <div class="overlay">
-          <i class="iconfont icon-text">
-          </i>
+      <article id="post-1" class="post-1 post type-post status-publish format-standard has-post-thumbnail hentry category-uncategorized">
+        <div class="toc"></div>
+        <!--<div class="toc-entry-content"><!-- 套嵌目录使用（主要为了支援评论）-->
+        
+          <header class="entry-header">
+            <h1 class="entry-title">Graph Structure of Neural Networks</h1>
+            <p class="entry-census">顾楠溪&nbsp;·&nbsp;2020-7-16&nbsp;·&nbsp;<span id="busuanzi_value_page_pv"></span>次阅读</p></p>
+
+            <hr>
+          </header>
+        
+        <div class="entry-content">
+          <h1 id="Graph-Structure-of-Neural-Networks"><a href="#Graph-Structure-of-Neural-Networks" class="headerlink" title="Graph Structure of Neural Networks"></a>Graph Structure of Neural Networks</h1><p>[作者] Jiaxuan You, Jure Leskovec, Kaiming He, Saining Xie</p>
+<p>[链接] <a href="https://arxiv.org/pdf/2007.06559.pdf" target="_blank" rel="noopener">https://arxiv.org/pdf/2007.06559.pdf</a></p>
+<p>[摘要] </p>
+<p>神经网络通常表示为由神经元间的连接构成的图，但是尽管这种表示方式被广泛应用，但对于神经网络的图结构以及其性能之间的关系我们知之甚少。本文系统性地研究了神经网络的图结构是如何影响他们的预测性能的。为此，本文建立了一个新颖的基于图的神经网络表示，称为关系图 (Relational Graph)，其中神经网络的层运算对应于图结构的消息交换。</p>
+<p>通过这种表示方法，本文展示了以下几点：</p>
+<ol>
+<li><p>关系图的最佳位置 (Sweet Spot, 最佳击球点) 可以使神经网络的性能极大提升；</p>
+</li>
+<li><p>神经网络的性能近似于聚类系数和其关系图的平均路径长度的光滑函数；</p>
+</li>
+<li><p>本文发展在许多不同的任务和数据集上保持一致；</p>
+</li>
+<li><p>可以有效率地识别最佳位置；</p>
+</li>
+<li><p>具有高性能的神经网络有着和真实生物神经网络类似的结构。</p>
+</li>
+</ol>
+<p>本文工作为神经网络架构设计以及神经网络的一般理解开辟了新方向。</p>
+<h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h2><p>虽然已经广泛了解了神经网络的性能依赖于他们的网络结构，但对于神经网络的准确性和他们潜在的图结构之间的联系缺乏系统性的理解。</p>
+<p>这对于神经网络架构搜索来说很重要，因为我们现在仍然是在所有可能的连接模式上进行穷举搜索。</p>
+<p>那么从这一角度来看，就存在一些问题可供讨论研究：</p>
+<ul>
+<li><p>网络结构和预测性能之间是否存在系统性联系？</p>
+</li>
+<li><p>高性能的神经网络有什么样的结构特征？</p>
+</li>
+<li><p>这些结构特征如何泛化到别的任务和数据集？</p>
+</li>
+<li><p>是否存在一种高效方式来判断给定的神经网络的优劣？</p>
+</li>
+</ul>
+<p>要建立神经网络架构和准确率的联系是十分困难的，因为我们并不清楚如何将神经网络映射成图 (反之亦然)。</p>
+<p>一个自然的选择就是使用计算图表示，但这存在许多局限性：</p>
+<ol>
+<li><p>缺乏一般性：因为计算图是有向无环图，在层级别上是双向的，在网络级别上是单进单出的。这限制了许多能够用在一般图上的各种丰富工具。</p>
+</li>
+<li><p>和生物/神经科学无关：生物神经网络有着更丰富且更少模板化的结构，例如在脑部网络中更多的是信息交换而不是信息单向流动。这些生物学或者神经学模型无法简单表示为有向无环图。</p>
+</li>
+</ol>
+<p>本文建立一种新的将神经网络表示为图的方式，称为关系图 (Relational Graph)。本文的关键想法在于关注消息交换 (Message Exchange) 而不只是单向数据流。</p>
+<p>具体的表示方法：对于一个固定宽度的全连接层，可以把输入通道和输出通道一起表示成一个单独的节点，而关系图中的边表示两个节点之间的消息交换。</p>
+<p>由此可以在摆脱计算图的各种限制的情况下，关系图能够表示许多类型的神经网络层。一个神经网络层对应于关系图上的一轮消息交换，对应地，深度网络即在相同图上进行几轮消息交换。这种新的表示方式使得我们能够建立更加多样的神经网络且用已有的工具来进行分析。</p>
+<p>本文设计了一个名为 WS-flex 的图生成器使得我们能够系统性地探索神经网络的设计空间，即关系图。</p>
+<p>基于神经科学的发现，本文使用聚类系数和关系图的平均路径长度来描述神经网络。</p>
+<p>使用标准图像分类数据集 CIFAR-10 和 ImageNet，本文研究了神经网络架构如何影响其预测性能的。本文做了以下重要的经验性观察：</p>
+<ul>
+<li><p>在有限计算资源下，关系图的最佳位置可以让神经网络性能得到极大提升；</p>
+</li>
+<li><p>神经网络的性能近似于聚类系数和关系图的平均路径长度的光滑函数；</p>
+</li>
+<li><p>在许多神经网络架构和任务上，本文的发现都成立；</p>
+</li>
+<li><p>关系图的最佳位置可以有效率地识别到，只需要少量相关图的样本和几轮训练；</p>
+</li>
+<li><p>具有良好性能的神经网络与真实生物神经网络在图结构上有惊人的相似性。</p>
+</li>
+</ul>
+<h2 id="2-Neural-Networks-as-Relational-Graphs"><a href="#2-Neural-Networks-as-Relational-Graphs" class="headerlink" title="2. Neural Networks as Relational Graphs"></a>2. Neural Networks as Relational Graphs</h2><h3 id="Message-Exchange-over-Graphs"><a href="#Message-Exchange-over-Graphs" class="headerlink" title="Message Exchange over Graphs"></a>Message Exchange over Graphs</h3><p>定义图 $G=(\mathcal{V},\mathcal{E})$，其节点集为 $\mathcal{V}={v_1,\cdots,v_n}$，边集为 $\mathcal{E}\subseteq {(v_i,v_j)|v_i,v_j\in\mathcal{V}}$，每个节点 $v$ 有一个节点属性标量/向量 $x_v$</p>
+<p>当图 $G$ 与神经元之间的消息交换有关时称 $G$ 为关系图 (Relational Graphs)，具体地，消息交换由消息函数和聚合函数共同定义，消息函数的输入是节点的特征，输出是消息；聚合函数的输入是消息集，输出是更新的节点特征。在每一轮消息交换中，每个节点将消息发送给邻居，然后聚合所有从邻居发来的消息。每个消息在边上由消息函数 $f(\cdot)$ 进行变换，然后在每个节点上通过聚合函数 $AGG(\cdot)$ 进行聚合。</p>
+<p>假设进行了 $R$ 轮消息交换，那么第 $r$ 轮节点 $v$ 上的消息交换定义如下，公式 [1]：</p>
+<p>$$<br>\mathbf{x}_v^{r+1}=AGG^{(r)}({f_v^{(r)}(\mathbf{x}_u^{(r)}),\forall u\in N(v)})<br>$$</p>
+<p>其中 $u$ 和 $v$ 都是图中的节点，$N(v)={u|v\lor(u,v)\in\mathcal{E}}$ 是节点 $v$ 的邻居，$\mathbf{x}_v^{(r)}$ 是输入节点特征，$\mathbf{x}_v^{(r+1)}$ 是节点 $v$ 的输出节点特征。</p>
+<p>本文只考虑无向图，但以上消息交换可以定义在任何图上。</p>
+<h3 id="Fixed-width-MLPs-as-Relational-Graphs"><a href="#Fixed-width-MLPs-as-Relational-Graphs" class="headerlink" title="Fixed-width MLPs as Relational Graphs"></a>Fixed-width MLPs as Relational Graphs</h3><p>多层感知机由多个计算单元的层构成，每个神经元上对所有的标量输入进行加权求和，然后使用非线性激活函数进行输出。</p>
+<p>假设 MLP 的第 $r$ 层的输入为 $\mathbf{x}^{(r)}$，输出为 $\mathbf{x}^{(r+1)}$，神经元的计算过程如下：</p>
+<p>$$<br>x_i^{(r+1)}=\sigma(\sum_j w_{ij}^{(r)}x_j^{(r)})<br>$$</p>
+<ul>
+<li>$w_{ij}^{(r)}$ 是可训练权重</li>
+<li>$x_j^{(r)}$ 是输入 $\mathbf{x}^{(r)}$ 的第 $j$ 维，即 $\mathbf{x}^{(r)}=(x_1^{(r)},\cdots,x_n^{(r)})$，</li>
+<li>$x_i^{(r+1)}$ 是输出 $\mathbf{x}^{(r+1)}$ 的第 $i$ 维，</li>
+<li>$\sigma$ 是非线性函数。</li>
+</ul>
+<p>考虑特殊情形：所有层的输入和输出都有着相同的特征维度，此时全连接的固定宽度的 MLP 层可以表示为 Complete Relational Graph，其中每个节点都和其他节点相连，即邻居集为整个节点集 $N(v)=\mathcal{V}$，此外，这样的 MLP 层有特殊的消息交换，其中消息函数为 $f_i(x_j)=w_{ij}x_i$，聚合函数为 $AGG({x_i})=\sigma(\sum{x_i})$</p>
+<p>结合一般的消息交换定义 (公式[1])，可以得到固定宽度的 MLP 的消息交换公式：</p>
+<p>$$<br>x_i^{(r+1)}=\sigma(\sum_{j\in N(i)} w_{ij}^{(r)}x_j^{(r)})<br>$$</p>
+<h3 id="General-Neural-Networks-as-Relational-Graphs"><a href="#General-Neural-Networks-as-Relational-Graphs" class="headerlink" title="General Neural Networks as Relational Graphs"></a>General Neural Networks as Relational Graphs</h3><h4 id="Variable-width-ML"><a href="#Variable-width-ML" class="headerlink" title="Variable-width ML"></a>Variable-width ML</h4><p>利用 Concat 的方式将节点特征从标量 $x_i^{(r)}$ 变为向量 $\mathbf{x}_i^{(r)}$，同时将消息函数拓展为矩阵形式，此时消息交换公式如下：</p>
+<p>$$<br>\mathbf{x}<em>i^{(r+1)}=\sigma(\sum</em>{j\in N(i)}\mathbf{W}_{ij}^{(r)}\mathbf{x}_j^{(r)})<br>$$</p>
+<ul>
+<li>$\mathbf{W}_{ij}^{(r)}$ 为权重矩阵</li>
+</ul>
+<p>此时可以满足：</p>
+<ol>
+<li>同一个节点在不同层中的表示可以有不同的维度，如 $\mathbf{x}_i^{(r)}$ 和 $\mathbf{x}_i^{(r+1)}$</li>
+<li>在同一层中，不同节点可以有不同的维数，如 $\mathbf{x}_i^{(r)}$ 和 $\mathbf{x}_j^{(r)}$</li>
+</ol>
+<p>假设此时有 $n$ 个节点构成的关系图表示一个 $m$ 维的层，那么有 $m \mod n$ 个节点的维数为 $\lfloor m/n\rfloor+1$，剩下的 $n-(m\mod n)$ 个节点的维数为 $\lfloor m/n\rfloor$。<br>可以发现关系图的最大数量的节点数受限于对应的神经网络最窄层的宽度，这是因为每个节点的特征维度至少为 1。</p>
+<h4 id="CNNs"><a href="#CNNs" class="headerlink" title="CNNs"></a>CNNs</h4><p>图像张量 $\mathbf{X}^{(r)}=\text{CONCAT}(\mathbf{X}^{(r)}_1,\cdots,\mathbf{X}_n^{(r)})$ 作为输入，消息交换公式如下：</p>
+<p>$$<br>\mathbf{X}<em>i^{(r+1)}=\sigma(\sum</em>{j\in N(i)}\mathbf{W}_{ij}^{(r)}*\mathbf{X}_j^{(r)})<br>$$</p>
+<ul>
+<li>$*$ 是卷积算子</li>
+<li>$\mathbf{W}_{ij}^{(r)}$ 是卷积滤波器</li>
+</ul>
+<h4 id="Modern-Neural-Architectures"><a href="#Modern-Neural-Architectures" class="headerlink" title="Modern Neural Architectures"></a>Modern Neural Architectures</h4><ul>
+<li>ResNet 保持层之间的残差链接不变</li>
+<li>Bottleneck Transform</li>
+<li>Separable Convolution</li>
+</ul>
+<h2 id="3-Exploring-Relational-Graphs"><a href="#3-Exploring-Relational-Graphs" class="headerlink" title="3. Exploring Relational Graphs"></a>3. Exploring Relational Graphs</h2><p>此部分描述如何设计和探索关系图空间以更好地研究网络结构和预测性能之间的关系，从三方面考虑：</p>
+<ol>
+<li>图度量 (Graph Measures) 用于描述图结构性质；</li>
+<li>图生成器 (Graph Generators) 用于生成多样图</li>
+<li>控制计算资源预算 (Control the Computational Budget) 从而保证网络的性能的不同的原因是他们的关系图结构不同</li>
+</ol>
+<h3 id="Selection-of-Graph-Measures"><a href="#Selection-of-Graph-Measures" class="headerlink" title="Selection of Graph Measures"></a>Selection of Graph Measures</h3><p>本文考虑一个全局图度量 (平均路径长度) 和局部图度量 (聚类系数)。<br>平均路径长度表示任意节点对之间的平均最短路径距离。<br>聚类系数是指每一个节点的邻居间实际存在的连边数除以这些邻居所有可能存在的连边数的比值，然后所有节点进行平均化。</p>
+<h3 id="Design-of-Graph-Generators"><a href="#Design-of-Graph-Generators" class="headerlink" title="Design of Graph Generators"></a>Design of Graph Generators</h3><p>给定了图度量之后，我们希望图生成器可以生成能够覆盖大跨度图度量的多样相关图。<br>传统的图生成器只能生成有限类别的图，而基于学习的方法则主要模仿给定的范例图。</p>
+<h4 id="Limitations-of-Existing-Graph-Generators"><a href="#Limitations-of-Existing-Graph-Generators" class="headerlink" title="Limitations of Existing Graph Generators"></a>Limitations of Existing Graph Generators</h4><p>研究了以下经典的图生成器：</p>
+<ol>
+<li>Erdos-Renyi (ER) 模型</li>
+<li>Watts-Strogatz (WS) 模型</li>
+<li>Barabasi-Albert (BA) 模型</li>
+<li>Harary 模型</li>
+<li>regular ring lattice graphs (ring graphs)</li>
+<li>complete graphs</li>
+</ol>
+<p>对于上述的图生成器，节点数量设置为 64，枚举所有可能的离散参数，网格化搜索所有的连续参数。<br>对于每个参数设置，使用不同的随机种子生成三十个随机图。</p>
+<p>一共生成了 53000 ER 图，486000 个 WS 图，8000 个 BA 图，1800 个 Harary 图，54 个 ring 图以及一个完全图。</p>
+<p>下图展示了这些经典图生成器在平均路径长度和聚类系数空间中是有限范围的。</p>
+<h4 id="WS-flex-Graph-Generator"><a href="#WS-flex-Graph-Generator" class="headerlink" title="WS-flex Graph Generator"></a>WS-flex Graph Generator</h4><p>WS-flex 图几乎囊括了前面介绍过的经典随机生成器生成的图。</p>
+<p>WS-flex 生成器通过放松所有节点在随机重连之前有相同的度数这一约束条件来对 WS 模型进行泛化。</p>
+<p>具体地，WS-flex 生成器的参数有节点数 $n$，平均度数 $k$ 和随机重连概率 $p$。<br>边的数目由 $e=\lfloor n*k/2\rfloor$ 决定。</p>
+<p>WS-flex 生成器首先生成一个 ring 图，每个节点都和  $\lfloor e/n\rfloor$ 个邻居节点相连，然后生成器随机选择个 $e\mod n$ 个节点并将每个节点和其最接近的节点相连，最后所有边根据概率 $p$ 进行随机重连。</p>
+<p>本文使用 WS-flex 生成器在聚类系数和平均路径长度的空间内平滑采样，然后子采样 3942 个图用于试验。</p>
+<h3 id="Controlling-Computational-Budget"><a href="#Controlling-Computational-Budget" class="headerlink" title="Controlling Computational Budget"></a>Controlling Computational Budget</h3><p>为了比较由这些生成的图对应的神经网络的性能，需要确保他们具有近似相同的复杂度，从而让性能的不同只来源于结构的差异。<br>本文使用 FLOPS 作为度量，先计算基线网络实例即完全关系图的 FLOPS，然后作为试验中参考的复杂度调节不同的网络，容许的误差为 0.5%。</p>
+<h2 id="4-Experimental-Setup"><a href="#4-Experimental-Setup" class="headerlink" title="4. Experimental Setup"></a>4. Experimental Setup</h2><p>CIFAR-10 数据集：<br>ImageNet 数据集：</p>
+<h2 id="Base-Architectures"><a href="#Base-Architectures" class="headerlink" title="Base Architectures"></a>Base Architectures</h2><h3 id="CIFAR-10-实验"><a href="#CIFAR-10-实验" class="headerlink" title="CIFAR-10 实验"></a>CIFAR-10 实验</h3><p>[数据集] 50000 训练图像，10000 验证图像<br>[网络结构] 5 层 MLP，512 个隐藏单元</p>
+<ul>
+<li>输入是 3072 维平铺向量 (32×32×3 大小的图像)</li>
+<li>输出是 10 维的预测值</li>
+<li>每层有 ReLU 非线性激活函数和 BatchNorm 层</li>
+</ul>
+<p>[超参数] </p>
+<ul>
+<li>批次大小为 128</li>
+<li>训练 200 轮</li>
+<li>学习率：初始值 0.1，满足 cosine schedule</li>
+</ul>
+<p>[结果输出] 设置五个随机种子然后取平均结果</p>
+<h3 id="ImageNet-实验"><a href="#ImageNet-实验" class="headerlink" title="ImageNet 实验"></a>ImageNet 实验</h3><p>[数据集] 1000 图像类别，1.28 M 训练图像，50000 验证图像<br>[网络结构]<br>五种网络结构：</p>
+<ol>
+<li>ResNet-34 </li>
+<li>ResNet-34-sep</li>
+<li>ResNet-50</li>
+<li>EfficientNet-B0</li>
+<li>8 层 CNN，卷积核 3×3</li>
+</ol>
+<p>[超参数]</p>
+<ul>
+<li>批次大小为 256 (ResNet) 和 512 (EfficientNet-B0)</li>
+<li>训练 100 轮</li>
+<li>学习率：初始值 0.1，满足 cosine schedule</li>
+</ul>
+<p>[结果输出] 设置三个随机种子然后取平均结果</p>
+<p>所有的基线架构都有一个完全关系图结构</p>
+<h2 id="5-Results"><a href="#5-Results" class="headerlink" title="5. Results"></a>5. Results</h2><h3 id="A-Sweet-Spot-for-Top-Neural-Networks"><a href="#A-Sweet-Spot-for-Top-Neural-Networks" class="headerlink" title="A Sweet Spot for Top Neural Networks"></a>A Sweet Spot for Top Neural Networks</h3><p>热图 (图度量 vs. 预测性能) 告诉我们存在着性能比完全图基线要好的图结构，</p>
+<h3 id="Neural-Network-Performance-as-a-Smooth-Function-over-Graph-Measures"><a href="#Neural-Network-Performance-as-a-Smooth-Function-over-Graph-Measures" class="headerlink" title="Neural Network Performance as a Smooth Function over Graph Measures"></a>Neural Network Performance as a Smooth Function over Graph Measures</h3><h3 id="Consistency-across-Architectures"><a href="#Consistency-across-Architectures" class="headerlink" title="Consistency across Architectures"></a>Consistency across Architectures</h3>
         </div>
-        <img width="150" height="150" src="https://static.2heng.xin/wp-content/uploads//2019/02/wallhaven-672007-1-1024x576.png" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt="" >
-      </a>
-    </div>
-    <h1 class="entry-title">
-    <a href="/2018/12/12/Hexo-Theme-Sakura/">
-    Hexo-Theme-Sakura</a>
-    </h1>
-    <div class="p-time">
-      <i class="iconfont icon-time">
-      </i>
-    2018-12-12</div>
-    <p>
-    hexo-sakura主题使用教程</p>
-    <footer class="entry-footer">
-      <div class="post-more">
-        <a href="/2018/12/12/Hexo-Theme-Sakura/">
-          <i class="iconfont icon-caidan">
-          </i>
-        </a>
-      </div>
-    </footer>
-  </div>
-  <hr>
-</article>
-  
+        <!-- .entry-content -->
+        <div class="single-reward">
+          <div class="reward-open">赏
+            <div class="reward-main">
+              <ul class="reward-row">
+                <li class="alipay-code"><img src="/img/custom/donate/AliPayQR.jpg"></li>
+                <li class="wechat-code"><img src="/img/custom/donate/WeChanQR.jpg"></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center; width: 100%" class="social-share share-mobile" data-disabled="diandian, tencent"></div>
+        <footer class="post-footer">
+          <div class="post-lincenses"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="nofollow"><i class="fa fa-creative-commons" aria-hidden="true"></i> 知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议</a></div>
+          <div class="post-tags">
+          </div>
+          <div class="post-share">
+            <div class="social-share sharehidden share-component"></div>
+            <i class="iconfont show-share icon-forward"></i>
+          </div>
+        </footer><!-- .entry-footer -->
+      </article>
+      <!-- #post-## -->
+      <div class="toc" style="background: none;"></div>
+      <section class="post-squares nextprev">
+        
+          
+            <div class="post-nepre half previous">
+          
+            <a href="/2020/07/18/Hello/" rel="prev">
+              <div class="background">
+                <img class="lazyload" src="" data-src="" style="width: 100%; height: 100%; object-fit: cover; pointer-events: none;" onerror="imgError(this,3)" src="">
+              </div>
+              <span class="label">
+              Previous Post</span>
+              <div class="info">
+                <h3>
+                </h3>
+                <hr>
+              </div>
+            </a>
+          </div>
+        
+        
+          
+            <div class="post-nepre half next">
+          
+            <a href="/2018/12/12/Hexo-Theme-Sakura/" rel="next">
+              <div class="background">
+                <img class="lazyload" src="" data-src="https://static.2heng.xin/wp-content/uploads//2019/02/wallhaven-672007-1-1024x576.png" style="width: 100%; height: 100%; object-fit: cover; pointer-events: none;" onerror="imgError(this,3)" src="https://static.2heng.xin/wp-content/uploads//2019/02/wallhaven-672007-1-1024x576.png">
+              </div>
+              <span class="label">
+              Next Post</span>
+              <div class="info">
+                <h3>
+                Hexo-Theme-Sakura</h3>
+                <hr>
+              </div>
+            </a>
+          </div>
+        
+      </section>
+      
+<div id="vcomments"></div>
+<script>
+  window.onload = function(){
+      var valine = new Valine();
+      valine.init({
+        el: '#vcomments',
+        appId: "GyC3NzMvd0hT9Yyd2hYIC0MN-gzGzoHsz",
+        appKey: "mgOpfzbkHYqU92CV4IDlAUHQ",
+        path: window.location.pathname,
+        placeholder: "你是我一生只会遇见一次的惊喜 ..."
+      })
+  }
+</script>
 
-
-      <div class="clearer">
-      </div>
-    </main>
-    <!--  -->
-    
-  </div>
+      <section class="author-profile">
+        <div class="info" itemprop="author" itemscope="" itemtype="https://schema.org/Person">
+          <a href="" class="profile gravatar"><img src="https://cdn.jsdelivr.net/gh/Singularity-Syo/Collections@1.3/82352598_p0.jpg" itemprop="image" alt="顾楠溪" height="70" width="70"></a>
+          <div class="meta">
+            <span class="title">Author</span>
+            <h3 itemprop="name">
+            <a href="" itemprop="url" rel="author">顾楠溪</a>
+            </h3>
+          </div>
+        </div>
+        <hr>
+        <p><i class="iconfont icon-write"></i></p>
+      </section>
+    </main><!-- #main -->
+  </div><!-- #primary -->
 </div>
 
-<!-- 
-  
-    <article class="post post-list" itemscope="" itemtype="https://schema.org/BlogPosting">
-  <div class="post-entry">
-    <div class="feature">
-      <a href="/2018/12/12/Hexo-Theme-Sakura/">
-        <div class="overlay">
-          <i class="iconfont icon-text">
-          </i>
-        </div>
-        <img width="150" height="150" src="https://static.2heng.xin/wp-content/uploads//2019/02/wallhaven-672007-1-1024x576.png" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt="" >
-      </a>
-    </div>
-    <h1 class="entry-title">
-    <a href="/2018/12/12/Hexo-Theme-Sakura/">
-    Hexo-Theme-Sakura</a>
-    </h1>
-    <div class="p-time">
-      <i class="iconfont icon-time">
-      </i>
-    2018-12-12</div>
-    <p>
-    hexo-sakura主题使用教程</p>
-    <footer class="entry-footer">
-      <div class="post-more">
-        <a href="/2018/12/12/Hexo-Theme-Sakura/">
-          <i class="iconfont icon-caidan">
-          </i>
-        </a>
-      </div>
-    </footer>
-  </div>
-  <hr>
-</article>
-  
 
- -->
+
     </div>    
     <div class="ins-search">
     <div class="ins-search-mask"></div>
