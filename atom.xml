@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="/"/>
-  <updated>2020-07-16T11:52:14.297Z</updated>
+  <updated>2020-07-17T12:52:05.397Z</updated>
   <id>/</id>
   
   <author>
@@ -15,6 +15,50 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title></title>
+    <link href="/2020/07/18/Note/"/>
+    <id>/2020/07/18/Note/</id>
+    <published>2020-07-17T16:56:29.229Z</published>
+    <updated>2020-07-17T12:52:05.397Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h1 id=&quot;Graph-Structure-of-Neural-Networks&quot;&gt;&lt;a href=&quot;#Graph-Structure-of-Neural-Networks&quot; class=&quot;headerlink&quot; title=&quot;Graph Structure of
+        
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title></title>
+    <link href="/2020/07/18/Hello/"/>
+    <id>/2020/07/18/Hello/</id>
+    <published>2020-07-17T16:55:55.584Z</published>
+    <updated>2020-07-17T16:56:46.038Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h1 id=&quot;Hello&quot;&gt;&lt;a href=&quot;#Hello&quot; class=&quot;headerlink&quot;
+        
+      
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title>Hexo-Theme-Sakura</title>
